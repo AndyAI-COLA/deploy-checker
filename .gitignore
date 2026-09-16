@@ -1,0 +1,29 @@
+﻿# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Generated reports (don't track output files)
+*.log
+*.json
+!package.json
+
+# Temp files
+checker_decoded.py
+my_report.*
+gen.py
+b64data.txt
+screenshots/
