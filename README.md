@@ -5,7 +5,7 @@
 ![Python](https://img.shields.io/badge/Python-3.8%2B-blue?logo=python&logoColor=white)
 ![Platform](https://img.shields.io/badge/Platform-Windows%20%7C%20Linux%20%7C%20macOS-lightgrey)
 ![License](https://img.shields.io/badge/License-MIT-green)
-![CI](https://img.shields.io/github/actions/workflow/status/你的用户名/deploy-checker/test.yml?branch=main&label=CI)
+![CI](https://img.shields.io/github/actions/workflow/status/AndyAI-COLA/deploy-checker/test.yml?branch=main&label=CI)
 
 ---
 
@@ -71,7 +71,7 @@
 
 ### 1. 克隆仓库
 ```bash
-git clone https://github.com/你的用户名/deploy-checker.git
+git clone https://github.com/AndyAI-COLA/deploy-checker.git
 cd deploy-checker
 ```
 
@@ -179,9 +179,9 @@ def check_my_item():
 
 欢迎贡献！请阅读 [CONTRIBUTING.md](CONTRIBUTING.md) 了解如何参与。
 
-- 🐛 报告 Bug → [Issues](https://github.com/你的用户名/deploy-checker/issues)
-- 💡 提建议 → [Discussions](https://github.com/你的用户名/deploy-checker/discussions)
-- 🔧 提交 PR → [Pull Requests](https://github.com/你的用户名/deploy-checker/pulls)
+- 🐛 报告 Bug → [Issues](https://github.com/AndyAI-COLA/deploy-checker/issues)
+- 💡 提建议 → [Discussions](https://github.com/AndyAI-COLA/deploy-checker/discussions)
+- 🔧 提交 PR → [Pull Requests](https://github.com/AndyAI-COLA/deploy-checker/pulls)
 
 ---
 

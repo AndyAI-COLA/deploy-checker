@@ -1,0 +1,126 @@
+name: Release
+
+on:
+  # 方式一：在 GitHub UI 一键触发，填入版本号
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "版本号 (例如 v1.0.0)"
+        required: true
+        type: string
+      release_name:
+        description: "Release 标题 (可选，默认用版本号)"
+        required: false
+        type: string
+      prerelease:
+        description: "是否为预发布版本"
+        required: false
+        type: boolean
+        default: false
+
+  # 方式二：推送 tag 自动触发
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  smoke-test:
+    name: Smoke test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Run checker.py
+        run: python checker.py
+
+      - name: Verify output files
+        run: |
+          test -f deploy_check_report.log  || { echo "❌ .log file missing"; exit 1; }
+          test -f deploy_check_report.json || { echo "❌ .json file missing"; exit 1; }
+          echo "✅ Smoke test passed"
+
+  release:
+    name: Create Release
+    needs: smoke-test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Determine version
+        id: version
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            TAG="${{ inputs.version }}"
+            NAME="${{ inputs.release_name }}"
+            PRERELEASE="${{ inputs.prerelease }}"
+          else
+            TAG="${GITHUB_REF#refs/tags/}"
+            NAME=""
+            PRERELEASE="false"
+          fi
+
+          # 确保 tag 以 v 开头
+          if [[ ! "$TAG" =~ ^v ]]; then
+            TAG="v$TAG"
+          fi
+
+          # 默认 title
+          if [ -z "$NAME" ]; then
+            NAME="Deploy Checker $TAG"
+          fi
+
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+          echo "name=$NAME" >> "$GITHUB_OUTPUT"
+          echo "prerelease=$PRERELEASE" >> "$GITHUB_OUTPUT"
+
+      - name: Create Git tag (workflow_dispatch only)
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag -a "${{ steps.version.outputs.tag }}" -m "Release ${{ steps.version.outputs.tag }}"
+          git push origin "${{ steps.version.outputs.tag }}"
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.version.outputs.tag }}
+          name: ${{ steps.version.outputs.name }}
+          prerelease: ${{ steps.version.outputs.prerelease }}
+          generate_release_notes: true
+          files: |
+            checker.py
+          body: |
+            ## 🛠️ Deploy Checker ${{ steps.version.outputs.tag }}
+
+            系统环境检测工具 — 一键检查当前系统是否满足部署要求。
+
+            ### 📦 下载
+
+            | 文件 | 说明 |
+            |------|------|
+            | `checker.py` | 主程序，下载后直接运行 `python checker.py` |
+            | Source code (zip/tar.gz) | 源码包 |
+
+            ### 🚀 快速使用
+
+            ```bash
+            # 下载后直接运行
+            python checker.py
+
+            # 只检查指定项
+            python checker.py -c python git disk
+
+            # 自定义输出文件名
+            python checker.py -o my_report
+            ```
